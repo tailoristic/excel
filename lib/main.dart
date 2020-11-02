@@ -37,13 +37,11 @@ class _MyHomePageState extends State<MyHomePage> {
             itemCount: _list.length,
             itemBuilder: (builder, index) {
               //print(_list.elementAt(index).city);
-              return Expanded(
-                child: ListTile(
-                  title: Text(
-                    data.data[index].city,
-                    style: TextStyle(
-                      fontSize: 25.0,
-                    ),
+              return ListTile(
+                title: Text(
+                  data.data[index].city,
+                  style: TextStyle(
+                    fontSize: 25.0,
                   ),
                 ),
               );
@@ -56,13 +54,11 @@ class _MyHomePageState extends State<MyHomePage> {
           itemCount: searchList.length,
           itemBuilder: (builder, index) {
             print(searchList.elementAt(index).city);
-            return Expanded(
-              child: ListTile(
-                title: Text(
-                  data.data[index].city,
-                  style: TextStyle(
-                    fontSize: 25.0,
-                  ),
+            return ListTile(
+              title: Text(
+                data.data[index].city,
+                style: TextStyle(
+                  fontSize: 25.0,
                 ),
               ),
             );
@@ -98,6 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 controller: searchText,
                 onChanged: (value) {
                   filterSearchResults(value);
+                  setState(() {});
                 },
                 decoration: InputDecoration(
                   hintText: "Search",
@@ -133,13 +130,18 @@ class _MyHomePageState extends State<MyHomePage> {
     for (var i in decodeData) {
       if (searchText.text.isNotEmpty) {
         searchList.forEach((data) {
-          if (i.contains(query)) {
+          if (_list
+              .elementAt(i)
+              .city
+              .toLowerCase()
+              .contains(query.toLowerCase())) {
             final well = Welcome(city: i['city'], id: i['id']);
             searchList.add(well);
           }
         });
       }
     }
+    setState(() {});
     return searchList;
   }
 }
