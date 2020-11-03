@@ -26,24 +26,48 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   TextEditingController searchText = TextEditingController();
 
+  var change = ValueNotifier<String>("");
   Widget futureList() {
     return FutureBuilder(
       future: hitApi(),
       builder: (context, data) {
         if (data.hasData && searchText.text.isEmpty) {
-          return ListView.builder(
-            shrinkWrap: true,
-            primary: false,
-            itemCount: _list.length,
-            itemBuilder: (builder, index) {
-              //print(_list.elementAt(index).city);
-              return ListTile(
-                title: Text(
-                  data.data[index].city,
-                  style: TextStyle(
-                    fontSize: 25.0,
-                  ),
-                ),
+          return ValueListenableBuilder(
+            valueListenable: change,
+            builder: (BuildContext context, String value, c) {
+              if (value.isEmpty) {
+                return ListView.builder(
+                  shrinkWrap: true,
+                  primary: false,
+                  itemCount: _list.length,
+                  itemBuilder: (builder, index) {
+                    print(_list.elementAt(index).city);
+                    return ListTile(
+                      title: Text(
+                        _list[index].city,
+                        style: TextStyle(
+                          fontSize: 25.0,
+                        ),
+                      ),
+                    );
+                  },
+                );
+              }
+              return ListView.builder(
+                shrinkWrap: true,
+                primary: false,
+                itemCount: searchList.length,
+                itemBuilder: (builder, index) {
+                  print(searchList.elementAt(index).city);
+                  return ListTile(
+                    title: Text(
+                      searchList[index].city,
+                      style: TextStyle(
+                        fontSize: 25.0,
+                      ),
+                    ),
+                  );
+                },
               );
             },
           );
@@ -56,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
             print(searchList.elementAt(index).city);
             return ListTile(
               title: Text(
-                data.data[index].city,
+                searchList[index].city,
                 style: TextStyle(
                   fontSize: 25.0,
                 ),
@@ -94,6 +118,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 controller: searchText,
                 onChanged: (value) {
                   filterSearchResults(value);
+                  change.value = value;
                   setState(() {});
                 },
                 decoration: InputDecoration(
@@ -124,24 +149,20 @@ class _MyHomePageState extends State<MyHomePage> {
 
   List<Welcome> searchList = [];
   Future<List<Welcome>> filterSearchResults(String query) async {
-    final response = await http.get(
-        "https://raw.githubusercontent.com/tailoristic/jsonT/main/db.json");
-    var decodeData = json.decode(response.body);
-    for (var i in decodeData) {
-      if (searchText.text.isNotEmpty) {
-        searchList.forEach((data) {
-          if (_list
-              .elementAt(i)
-              .city
-              .toLowerCase()
-              .contains(query.toLowerCase())) {
-            final well = Welcome(city: i['city'], id: i['id']);
-            searchList.add(well);
-          }
-        });
+    var data = _list;
+    searchList.clear();
+    data.map((e) {
+      if (e.city.toUpperCase().contains(query.toUpperCase())) {
+        searchList.add(e);
       }
-    }
-    setState(() {});
+    }).toList();
+
+    setState(() {
+      if (query.isEmpty) {
+        _list.clear();
+        searchList.clear();
+      }
+    });
     return searchList;
   }
 }

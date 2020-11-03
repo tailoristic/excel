@@ -1,12 +1,3 @@
-import 'dart:convert';
-
-String url = "https://raw.githubusercontent.com/tailoristic/jsonT/main/db.json";
-List<Welcome> welcomeFromJson(url) =>
-    List<Welcome>.from(json.decode(url).map((x) => Welcome.fromJson(x)));
-
-String welcomeToJson(List<Welcome> data) =>
-    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
-
 class Welcome {
   Welcome({
     this.id,
